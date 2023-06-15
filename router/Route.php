@@ -30,7 +30,7 @@ class Route
     }
 
     public function parse() {
-        $uriArray = explode('/', $this->uri);
+        $uriArray = explode('/', $this->uri); // /task/create
         $this->controller = $uriArray['1'];
         $this->action = $uriArray['2'];
         $this->params = array_slice($uriArray, 3);
