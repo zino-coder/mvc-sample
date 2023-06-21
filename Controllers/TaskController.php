@@ -41,4 +41,32 @@ class TaskController extends Controller
 
         return header('Location: /task/index');
     }
+
+    public function edit($id) {
+        $task = $this->model->getTaskById($id);
+        $taskStatus = $this->model->getAllTaskStatus();
+
+        return $this->render('create', ['task' => $task, 'taskStatus' => $taskStatus]);
+    }
+
+    public function update($id) {
+        $task = $this->model->update([
+            'title' => $_POST['title'],
+            'description' => $_POST['description'],
+            'status' => $_POST['status'],
+            'id' => $id,
+        ]);
+
+        $_SESSION['success'] = 'Sửa task thành công';
+
+        return header('Location: /task/index');
+    }
+
+    public function delete($id) {
+        $task = $this->model->deleteTaskById($id);
+
+        $_SESSION['success'] = 'Xoá task thành công';
+
+        return header('Location: /task/index');
+    }
 }

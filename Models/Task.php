@@ -2,7 +2,7 @@
 
 class Task extends Connection
 {
-    private $perPage = 1;
+    private $perPage = 3;
 
     public function getLastPage() {
         $query = $this->getBdd()->query('SELECT COUNT(*) AS total FROM tasks');
@@ -15,9 +15,8 @@ class Task extends Connection
     public function getAllTask($page)
     {
         $offset = ($page - 1) * $this->perPage;
-        var_dump($this->perPage);
         $sql = '
-        SELECT tasks.*,
+        SELECT tasks.*, ROW_NUMBER() OVER (ORDER BY id) AS row_id,
        CASE
            WHEN ts.id = 1 THEN CONCAT(\'<span class="btn btn-outline-primary disabled">\', ts.name, \'</span>\')
            WHEN ts.id = 2 THEN CONCAT(\'<span class="btn btn-outline-primary disabled">\', ts.name, \'</span>\')
@@ -54,5 +53,37 @@ FROM tasks
         ]);
 
         return $query->fetch();
+    }
+
+    public function getTaskById($id) {
+        $query = $this->getBdd()->prepare('SELECT * from tasks where id = :id');
+
+        $query->execute([
+            'id' => $id
+        ]);
+
+        return $query->fetch();
+    }
+
+    public function update($params = []) {
+        $query = $this->getBdd()->prepare('UPDATE tasks SET title=:title, description=:description, status=:status where id =:id');
+        $query->execute([
+            'title' => $params['title'],
+            'description' => $params['description'],
+            'status' => $params['status'],
+            'id' => $params['id'],
+        ]);
+
+        return $query->fetch();
+    }
+
+    public function deleteTaskById($id) {
+        $query = $this->getBdd()->prepare('DELETE FROM tasks WHERE id = :id');
+
+        $query->execute([
+            'id' => $id,
+        ]);
+
+        return true;
     }
 }
